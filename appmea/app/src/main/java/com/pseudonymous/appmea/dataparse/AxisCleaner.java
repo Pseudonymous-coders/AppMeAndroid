@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.pseudonymous.appmea.MainActivity;
 import com.pseudonymous.appmea.network.ValuePair;
 
 import org.joda.time.DateTime;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 public class AxisCleaner implements AxisValueFormatter{
 
     private ArrayList<ValuePair> values = null;
-    private HashMap<Float, String> axisMap = null;
+    private HashMap<Float, String> axisMap = new HashMap<>();
     private int valueCount = 0;
     private boolean setFirst = true, setLast = true;
     private int scalingPoints = 100;
@@ -47,8 +48,20 @@ public class AxisCleaner implements AxisValueFormatter{
                 /*if(this.valueCount < this.scalingPoints) {
                     int vectorDisplacement = this.scalingPoints - this.valueCount;
                 }*/
+                long totalVals = 0;
 
+                DateTime lastTime = this.firstDate;
 
+                for(ValuePair pairTest : this.values) {
+                    long toComp = pairTest.getTimeStamp().getMillis() - lastTime.getMillis();
+                    Log.d("UPDATE_DISTANCE", String.valueOf(toComp));
+                    lastTime = pairTest.getTimeStamp();
+                    totalVals += toComp;//(pairTest.getTimeStamp().getMillis() - toComp);
+                }
+
+                long averageDistance = totalVals / this.valueCount;
+
+                Log.d("DISTANCE", "AVERAGE " + String.valueOf(averageDistance));
 
             } else Log.d("Error", "Couldn't set dates");
 
@@ -63,27 +76,30 @@ public class AxisCleaner implements AxisValueFormatter{
 
         for(ValuePair pair : this.values) {
             DateTime curTime = pair.getTimeStamp();
-            String toDisplay = "";
+            String toDisplay;
 
             if(isFirst && setFirst) {
                 toDisplay = curTime.toString();
                 isFirst = false;
-            } else if(setLast && valueCounter == valueCount) {
-                Log.d("ISLAST", "LASTVALUEFOUND");
+            } else if(setLast && valueCounter == (valueCount - 1)) {
                 toDisplay = curTime.toString();
             } else {
-
-
+                toDisplay = "9";
             }
-            axisMap.put((Float) pair.getValue(), toDisplay);
+            axisMap.put(((Integer)pair.getIdV()).floatValue(), toDisplay);
             valueCounter += 1;
         }
     }
 
     @Override
     public String getFormattedValue(float x_axis, AxisBase axis) {
-        if(axisMap == null || valueCount == 0) return null;
-        return this.axisMap.get(x_axis);
+        if(axisMap == null || valueCount == 0) return "";
+        String toRet = this.axisMap.get(x_axis);
+        if(toRet == null) {
+            //MainActivity.LogData("Value at " + String.valueOf(x_axis) + " is blank");
+            return "";
+        }
+        return toRet;
     }
 
     @Override

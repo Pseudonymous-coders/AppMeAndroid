@@ -12,9 +12,11 @@
     tools:context="com.pseudonymous.appmea.MainActivity"
     tools:openDrawer="start">
 
+    <!--
     <include
         android:id="@+id/tool_bar"
         layout="@layout/tool_bar" />
+    -->
 
     <include
         layout="@layout/app_bar_main"

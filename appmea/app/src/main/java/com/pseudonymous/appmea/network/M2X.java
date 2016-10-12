@@ -1,5 +1,7 @@
 package com.pseudonymous.appmea.network;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.util.Log;
 import android.util.SparseArray;
 

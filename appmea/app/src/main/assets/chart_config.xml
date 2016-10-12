@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chartconfigs>
+    <config>
+        <name>Pinch Zoom</name>
+        <method>setPinchZoom</method>
+
+        <value1>true</value1> <!-- Sets first argument -->
+
+    </config>
+
+    <config>
+        <name>Back Ground Color</name>
+        <method>setBackgroundColorC</method>
+
+        <value1>0,0,0,0</value1> <!-- alpha, red, green, blue -->
+    </config>
+
+    <config>
+        <name>Chart Description</name>
+        <method>setDescription</method>
+
+        <value1>Appmea results</value1> <!-- chart description -->
+    </config>
+
+    <config>
+        <name>Draw Grid</name>
+        <method>setGridSets</method>
+
+        <value1>false</value1> <!-- Draw graph grid or not -->
+    </config>
+
+    <config>
+        <name>Touchable graph</name>
+        <method>setTouchEnabled</method>
+
+        <value1>true</value1> <!-- Ability to interact with graph -->
+    </config>
+
+    <config>
+        <name>No data text</name>
+        <method>setNoDataText</method>
+
+        <value1>babycomeback</value1> <!-- Text when no graph data is available -->
+    </config>
+
+</chartconfigs>
