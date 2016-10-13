@@ -158,8 +158,32 @@ public class Splashscreen extends Activity {
                 //Currently set to M2X, find the key in CommonNetwork.java
                 try {
                     CommonNetwork.init();
+                    internetConnection = true;
                 } catch(Throwable ignored) {
+                    internetConnection = false;
                     MainActivity.LogData("FAILED SETTING UP M2X", true);
+                }
+
+                if(!internetConnection) {
+                    ErrorDialog("Data Error",
+                            "Failed loading user details from the server! Won't continue!");
+
+                    while(!continueSplash) {
+                        try {
+                            sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break; //Stop loop
+                        }
+                    }
+
+                    return;
+                }
+
+                try {
+
+                } catch (Throwable ignored) {
+                    MainActivity.LogData("FAILED LOADING USER PROFILE DETAILS", true);
                 }
 
                 //Start the Joda Time class interface

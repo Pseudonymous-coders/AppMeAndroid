@@ -37,6 +37,9 @@ import com.pseudonymous.appmea.fragment.NotificationsFragment;
 import com.pseudonymous.appmea.fragment.DataFragment;
 import com.pseudonymous.appmea.fragment.SettingsFragment;
 import com.pseudonymous.appmea.graphics.CircleTransform;
+import com.pseudonymous.appmea.network.CommonResponse;
+import com.pseudonymous.appmea.network.ProfileData;
+import com.pseudonymous.appmea.network.ResponseListener;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -53,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
     ChartConfig chart;
     Toolbar toolbar;
 
-    private static final String urlNavHeaderBg =
+    private static String urlNavHeaderBg =
             "http://mwhd.altervista.org/wp_upload/wallpapers/material/" +
                     "Rainbow_Material_Dark-Qwen_Lee.png";
 
-    private static final String urlProfileImg =
+    private static String urlProfileImg =
             "https://media.licdn.com/mpr/mpr/shrinknp_200_200/" +
                     "AAEAAQAAAAAAAAltAAAAJGJkMTFkZjY3LTEwMjktNDk4Yy04Zjg5LWJkZDlhZThkMzQ1NQ.jpg";
 
@@ -82,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean loadOnBack = true;
     private Handler mHandle;
+
+
+    public static ProfileData pfData; //Profile settings
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         //chart.setFromXMLSettings(getApplicationContext()); //Load settings from chart_config.xml
 
 
+        pfData = new ProfileData(); //New profile data object currently one user
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Load the navigation bar header (THEY SHOULD BE CONNECTED TO THE INTERNET)
+        //Set to demo user during initialization
         loadNavBar();
 
 
@@ -253,6 +262,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void loadUserProfile() {
+        ResponseListener respListen = new ResponseListener() {
+            @Override
+            public void on_complete(CommonResponse req) {
+                //Using the common network we created for M2X
+                //We can easily turn metadata into a commonResponse object
+                //With a single ValuePair with a JSON for all the user details
+                //Then parse it into the proper settings for ProfileData
+                //Essentially the steps behind this weird looking method
+                pfData = (ProfileData) req.getPair().getValue();
+
+                //@TODO - MAKE THIS MULTI USER AND NOT AS SLOW
+
+
+                //@TODO - DAVID PLEASE FINISH CREATING A PROFILE SETTING SO
+                //@TODO - THAT THIS CAN PROPERLY UPDATE THE IMAGE AND CHECK LOGIN
+                userName = pfData.getFirstName() + " " + pfData.getLastName();
+                urlProfileImg = pfData.getProfileImg();
+                urlNavHeaderBg = pfData.getBgImg();
+            }
+
+            @Override
+            public void on_fail(CommonResponse req) {
+
+            }
+        };
+
+        pfData.pullDetails(respListen);
+    }
+
     private void loadNavBar() {
         nameHeader.setText(userName);
         nameWebsite.setText(userSite);
@@ -284,9 +323,11 @@ public class MainActivity extends AppCompatActivity {
             amount.setTextColor(Color.WHITE);
             amount.setIncludeFontPadding(true);
             amount.setPadding(numberPadding, numberPadding, numberPadding, numberPadding);
-            if(amountNotifications > 9)
-                amount.setText("9+");
+
+            //If more than 9 notification just add a +
+            if(amountNotifications > 9) amount.setText("9+");
             else amount.setText(String.valueOf(amountNotifications));
+
             dotMenu.addView(amount);
         }
 

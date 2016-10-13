@@ -48,6 +48,36 @@ public class CommonNetwork {
         return null;
     }
 
+
+    public static void setMetaData(final String name, final JSONObject newDatam,
+                                   final ResponseListener resp) {
+        Thread metaupdate = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Request req = M2X.setMetaValue(name, newDatam);
+                CommonResponse c_resp = c_response(req);
+                resp.on_complete(c_resp);
+            }
+        });
+        metaupdate.setDaemon(true);
+        metaupdate.setName("M2X profile update");
+        metaupdate.start();
+    }
+
+    public static void getMetaData(final ResponseListener resp) {
+        Thread metaupdate = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Request req = M2X.getMetaValues();
+                CommonResponse c_resp = c_response(req);
+                resp.on_complete(c_resp);
+            }
+        });
+        metaupdate.setDaemon(true);
+        metaupdate.setName("M2X profile getter");
+        metaupdate.start();
+    }
+
     public static void setValue(final String key, final String set, final ResponseListener resp) {
         Thread sender = new Thread(new Runnable() {
             @Override

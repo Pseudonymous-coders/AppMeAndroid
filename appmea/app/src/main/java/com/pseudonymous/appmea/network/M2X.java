@@ -6,6 +6,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.github.kevinsawicki.http.HttpRequest;
+import com.pseudonymous.appmea.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,10 @@ public class M2X {
     private static String stream_base = "/streams";
     private static String device_id = "";
     public static String m2x_key = "";
+    public static final String
+            DEFAULT_DESC = "AppMeA Device by Pseudonymous",
+            DEFAULT_VISIBILITY = "publice",
+            DEFAULT_TAGS = "appmea";
     private static Map<Integer, String> ret_types = new HashMap<>();
 
     private static String[][] header_map = new String[][] {
@@ -81,6 +86,10 @@ public class M2X {
                 stream_base + (stream.isEmpty() ? "": ("/" + stream));
     }
 
+    private static String deviceBuild() {
+        return  base_url + device_base + device_id;
+    }
+
     public static Request getDataValue(String stream) {
         String url = stream_build(stream);
         return get_request(url);
@@ -101,6 +110,34 @@ public class M2X {
             request = put_request(url, tosend.toString());
         } catch (JSONException e) {
             Log.d("ERROR", "Failed to send");
+        }
+        return request;
+    }
+
+    public static Request setMetaValue(String name, JSONObject newData) {
+        String url = deviceBuild();
+        Request request = new Request();
+        try {
+            JSONObject tosend = new JSONObject();
+            tosend.put("name", name);
+            tosend.put("description", DEFAULT_DESC);
+            tosend.put("visibility", DEFAULT_VISIBILITY);
+            tosend.put("tags", DEFAULT_TAGS);
+            tosend.put("metadata", newData);
+            request = put_request(url, tosend.toString());
+        } catch (JSONException error) {
+            MainActivity.LogData("FAILED SETTING METADATA", true);
+        }
+        return request;
+    }
+
+    public static Request getMetaValues() {
+        String url = deviceBuild();
+        Request request = new Request();
+        try {
+            request = get_request(url);
+        } catch (Throwable error) {
+            MainActivity.LogData("FAILED GETTING METADATA", true);
         }
         return request;
     }
