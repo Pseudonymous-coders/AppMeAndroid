@@ -13,12 +13,12 @@ import com.pseudonymous.appmea.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MoviesFragment.OnFragmentInteractionListener} interface
+ * {@link DeviceFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MoviesFragment#newInstance} factory method to
+ * Use the {@link DeviceFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MoviesFragment extends Fragment {
+public class DeviceFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -30,7 +30,7 @@ public class MoviesFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public MoviesFragment() {
+    public DeviceFragment() {
         // Required empty public constructor
     }
 
@@ -43,8 +43,8 @@ public class MoviesFragment extends Fragment {
      * @return A new instance of fragment MoviesFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MoviesFragment newInstance(String param1, String param2) {
-        MoviesFragment fragment = new MoviesFragment();
+    public static DeviceFragment newInstance(String param1, String param2) {
+        DeviceFragment fragment = new DeviceFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -65,7 +65,7 @@ public class MoviesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_movies, container, false);
+        return inflater.inflate(R.layout.fragment_device, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

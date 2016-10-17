@@ -11,9 +11,9 @@
             android:icon="@drawable/ic_action_chart"
             android:title="@string/nav_data" />
         <item
-            android:id="@+id/nav_movies"
-            android:icon="@drawable/ic_action_movies"
-            android:title="@string/nav_movies" />
+            android:id="@+id/nav_device"
+            android:icon="@drawable/ic_action_device"
+            android:title="@string/nav_device" />
 
         <item
             android:id="@+id/nav_notifications"

@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.rey.material.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
-android:background="#242729"
+android:background="@drawable/splash_gradient_background"
 android:layout_gravity="center"
 android:id="@+id/lin_splash"
-android:gravity="top|center_horizontal"
+android:gravity="center"
 android:orientation="vertical"
-    android:weightSum="1">
+android:weightSum="1">
 
-    <ImageView
-        android:layout_width="243dp"
+    <com.rey.material.widget.ImageView
         android:id="@+id/splash"
-        android:background="@drawable/unnamed"
-        android:layout_height="232dp" />
+        android:background="@drawable/ic_pseudo_no_text"
+        android:layout_height="120dp"
+        android:layout_width="120dp" />
 
-</LinearLayout>
+    <com.rey.material.widget.TextView
+        android:text="@string/splash_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/pseudo_text_color"
+        android:background="#00ffffff"
+        android:textSize="25sp"
+        android:id="@+id/textView" />
+
+</com.rey.material.widget.LinearLayout>

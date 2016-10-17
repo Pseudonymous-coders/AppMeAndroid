@@ -202,19 +202,19 @@ public class Splashscreen extends Activity {
     }
 
     private void AnimationThread() {
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
-        anim.reset();
+        //Animation anim = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        //anim.reset();
         final LinearLayout l=(LinearLayout) findViewById(R.id.lin_splash);
         l.clearAnimation();
-        l.startAnimation(anim);
+        //l.startAnimation(anim);
 
-        anim = AnimationUtils.loadAnimation(this, R.anim.translate);
-        anim.reset();
+        //anim = AnimationUtils.loadAnimation(this, R.anim.translate);
+        //anim.reset();
         final ImageView iv = (ImageView) findViewById(R.id.splash);
         iv.clearAnimation();
-        iv.startAnimation(anim);
+        //iv.startAnimation(anim);
 
-        final Animation finalAnim = anim;
+        //final Animation finalAnim = anim;
         splashTread = new Thread() {
             @Override
             public void run() {
@@ -227,7 +227,7 @@ public class Splashscreen extends Activity {
                     }
 
                     //Prevent the screen from flashing black for a second
-                    Splashscreen.this.runOnUiThread(new Runnable() {
+                    /*Splashscreen.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             l.setBackgroundColor(Color.WHITE); //Reset the view back to white
@@ -241,14 +241,15 @@ public class Splashscreen extends Activity {
 
                             //Reset the animation to the beginning and make sure the background is
                             //Transparent so it doesn't flash black for a second
-                            finalAnim.setBackgroundColor(Color.TRANSPARENT);
-                            finalAnim.reset();
+                            //finalAnim.setBackgroundColor(Color.TRANSPARENT);
+                            //finalAnim.reset();
                         }
-                    });
+                    });*/
 
                     Intent intent = new Intent(Splashscreen.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent); //Starts MainActivity
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 } catch (InterruptedException ignored) {
                 } finally {
                     Splashscreen.this.finish();

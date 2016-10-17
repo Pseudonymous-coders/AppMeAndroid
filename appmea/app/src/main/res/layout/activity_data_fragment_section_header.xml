@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.rey.material.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:paddingTop="12dp">
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/title_list_text"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textAppearance="@style/SectionTitle"
+        android:height="20dp"
+        android:gravity="center"/>
+</com.rey.material.widget.LinearLayout>

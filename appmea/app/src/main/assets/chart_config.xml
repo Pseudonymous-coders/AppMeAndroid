@@ -12,7 +12,7 @@
         <name>Back Ground Color</name>
         <method>setBackgroundColorC</method>
 
-        <value1>0,0,0,0</value1> <!-- alpha, red, green, blue -->
+        <value1>0,0,0,0</value1> <!-- fade_in, red, green, blue -->
     </config>
 
     <config>

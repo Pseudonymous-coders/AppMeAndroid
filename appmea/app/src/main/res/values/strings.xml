@@ -7,19 +7,20 @@
     <!-- Navigation Drawer menu labels -->
     <string name="nav_home">Home</string>
     <string name="nav_data">Results</string>
-    <string name="nav_movies">Movies</string>
+    <string name="nav_device">Device</string>
     <string name="nav_notifications">Notifications</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_about_us">About Us</string>
 
-
+    <string name="splash_name">Pseudonymous</string>
     <string name="nav_image_desc">User Image</string>
+    <string name="menu_refresh">Refreshing…</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
     <string-array name="nav_item_activity_titles">
         <item>Home</item>
         <item>All Reports</item>
-        <item>Movies</item>
+        <item>Device Hub</item>
         <item>Notifications</item>
         <item>Settings</item>
     </string-array>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.rey.material.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@drawable/widget_border"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <WebView
+        android:id="@+id/text_title_desc"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:height="50dp"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbarDefaultDelayBeforeFade="0"
+        android:scrollbars="none"
+        android:padding="3dp"
+        android:paddingBottom="6dp"/>
+
+    <WebView
+        android:id="@+id/text_main_desc"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
+        android:scrollbarDefaultDelayBeforeFade="0"
+        android:scrollbars="none"
+        android:height="160dp"
+        android:paddingTop="2dp"/>
+
+    <!--
+    <com.rey.material.widget.TextView
+        android:id="@+id/text_title_desc"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:textAppearance="@style/TextTitle"
+        android:height="35dp"
+        android:padding="3dp"
+        android:paddingBottom="6dp"
+        android:gravity="start"/>
+
+    <com.rey.material.widget.TextView
+        android:id="@+id/text_main_desc"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:textAppearance="@style/TextBody"
+        android:height="50dp"
+        android:paddingTop="2dp"
+        android:gravity="start"/>
+    -->
+
+</com.rey.material.widget.LinearLayout>

@@ -2,6 +2,7 @@ package com.pseudonymous.appmea;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -31,10 +32,10 @@ import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.pseudonymous.appmea.dataparse.ChartConfig;
-import com.pseudonymous.appmea.fragment.HomeFragment;
-import com.pseudonymous.appmea.fragment.MoviesFragment;
-import com.pseudonymous.appmea.fragment.NotificationsFragment;
 import com.pseudonymous.appmea.fragment.DataFragment;
+import com.pseudonymous.appmea.fragment.HomeFragment;
+import com.pseudonymous.appmea.fragment.DeviceFragment;
+import com.pseudonymous.appmea.fragment.NotificationsFragment;
 import com.pseudonymous.appmea.fragment.SettingsFragment;
 import com.pseudonymous.appmea.graphics.CircleTransform;
 import com.pseudonymous.appmea.network.CommonResponse;
@@ -43,7 +44,9 @@ import com.pseudonymous.appmea.network.ResponseListener;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        HomeFragment.OnFragmentInteractionListener, DataFragment.OnFragmentInteractionListener,
+        DeviceFragment.OnFragmentInteractionListener {
 
     public static final String appName = "Appmea";
     private NavigationView navigationView;
@@ -75,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
+    private static final String TAG_DATA = "data";
+    private static final String TAG_DEVICE = "device";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     private static String CURRENT_TAG = TAG_HOME;
@@ -93,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        mHandle = new Handler();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -366,8 +372,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // If mPendingRunnable is not null, then add to the message queue
-        if(mPendingRunnable != null && mHandle != null)
+        if(mHandle != null) {
             mHandle.post(mPendingRunnable);
+            MainActivity.LogData("RUNNING NEW ACTIVITY");
+        }
+        else MainActivity.LogData("FAILED POSTING NEW ACTIVITY", true);
 
         // show or hide the fab button
         toggleFab();
@@ -380,14 +389,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Fragment getHomeFragment() {
+        MainActivity.LogData("LOADING FRAGMENT: " + String.valueOf(navigationIndex));
+
         switch (navigationIndex) {
             default:
                 return new HomeFragment(); //Default home fragment
-            case 1:
+            case navEnum.DATA:
                 return new DataFragment(); //Show the sleep reports
-            case 2:
-                // movies fragment
-                return new MoviesFragment();
+            case navEnum.DEVICE:
+                return new DeviceFragment(); //Show hub details
             case 3:
                 // notifications fragment
                 return new NotificationsFragment();
@@ -427,11 +437,11 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.nav_data:
                         navigationIndex = navEnum.DATA;
-                        CURRENT_TAG = TAG_PHOTOS;
+                        CURRENT_TAG = TAG_DATA;
                         break;
-                    case R.id.nav_movies:
-                        navigationIndex = 2;
-                        CURRENT_TAG = TAG_MOVIES;
+                    case R.id.nav_device:
+                        navigationIndex = navEnum.DEVICE;
+                        CURRENT_TAG = TAG_DEVICE;
                         break;
                     case R.id.nav_notifications:
                         navigationIndex = 3;
@@ -584,10 +594,16 @@ public class MainActivity extends AppCompatActivity {
 
     //Display fab if on the home screen
     private void toggleFab() { if (navigationIndex == navEnum.HOME) fab.show(); else fab.hide(); }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }
 
 class navEnum {
     static final int
             HOME = 0,
-            DATA = 1;
+            DATA = 1,
+            DEVICE = 2;
 }

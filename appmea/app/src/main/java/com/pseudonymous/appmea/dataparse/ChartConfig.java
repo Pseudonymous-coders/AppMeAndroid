@@ -1,21 +1,28 @@
 package com.pseudonymous.appmea.dataparse;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.pseudonymous.appmea.MainActivity;
+import com.pseudonymous.appmea.network.CommonNetwork;
+import com.pseudonymous.appmea.network.CommonResponse;
+import com.pseudonymous.appmea.network.ResponseListener;
 import com.pseudonymous.appmea.network.ValuePair;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -79,6 +86,28 @@ public class ChartConfig extends LineChart {
         this.getXAxis().setDrawAxisLine(toset);
     }
 
+    public void setAxisDraw(boolean axisDraw) {
+    }
+
+    public void setLightColors() {
+        this.getAxisLeft().setDrawZeroLine(true);
+        this.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        this.getAxis(YAxis.AxisDependency.LEFT).setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        this.getAxisRight().setDrawLabels(false);
+        this.getAxisLeft().setDrawZeroLine(true);
+        this.setBackgroundColor(Color.BLACK);
+        this.setDrawBorders(false);
+
+        this.setBorderColor(Color.WHITE);
+        this.setNoDataTextColor(Color.WHITE);
+        this.setDescriptionColor(Color.WHITE);
+        this.setGridBackgroundColor(Color.WHITE);
+        this.getAxisLeft().setTextColor(Color.WHITE);
+        this.getAxisRight().setTextColor(Color.WHITE);
+        this.getXAxis().setTextColor(Color.WHITE);
+    }
+
     private Object convertArgument(Class clazz, String value) {
         if(boolean.class == clazz) return Boolean.parseBoolean(value);
         if(float.class == clazz) return Float.parseFloat(value);
@@ -130,9 +159,44 @@ public class ChartConfig extends LineChart {
 
         LineDataSet lineSet = new LineDataSet(entries, label);
         Integer vals[] = ColorReps.get(label);
-        lineSet = setLineConfig(lineSet, label, vals[0], vals[1]);
+        if(vals != null) lineSet = setLineConfig(lineSet, label, vals[0], vals[1]);
+        else MainActivity.LogData("Line Values are null!", true);
 
         chartLines.add(lineSet);
+    }
+
+    public void LoadByCommonNetwork(String stream, final String label) {
+        LoadByCommonNetwork(stream, label, false, null);
+    }
+
+    public void setTouchable(boolean touchable) {
+        this.setTouchEnabled(touchable);
+    }
+
+    public void LoadByCommonNetwork(String stream, final String label, final boolean invalidate,
+                                    @Nullable final Activity activity) {
+        ResponseListener responseListener = new ResponseListener() {
+            @Override
+            public void on_complete(CommonResponse req) {
+                ArrayList<ValuePair> pairs = req.getPairs();
+                Collections.reverse(pairs); //Reverse the order from oldest to newest
+                setLineByPairs(pairs, label);
+
+                if(invalidate) {
+                    compileLinesInGraph();
+
+                    //Call method to update the activity graph
+                    //This actually runs on the ui method
+                    if(activity != null) updateGraph(activity);
+                }
+            }
+
+            @Override
+            public void on_fail(CommonResponse req) {
+
+            }
+        };
+        CommonNetwork.getValues(stream, responseListener);
     }
 
     public LineDataSet setLineConfig(LineDataSet dataSet, String label, int color, int text_color) {
@@ -159,7 +223,11 @@ public class ChartConfig extends LineChart {
         lineData.calcMinMax();
         lineData.notifyDataChanged();
         lineData.setDrawValues(true);
-        this.setData(lineData);
+        try {
+            this.setData(lineData);
+        } catch (IndexOutOfBoundsException id) {
+            MainActivity.LogData("TOO MANY INDEX'S!", true);
+        }
     }
 
     public void cleanXAxis() {
@@ -173,7 +241,7 @@ public class ChartConfig extends LineChart {
         xAxis.setValueFormatter(cleaner);
     }
 
-    public void updateGraph(MainActivity activity) {
+    public void updateGraph(Activity activity) {
         final ChartConfig tempClass = ChartConfig.this;
 
         activity.runOnUiThread(new Runnable() {
