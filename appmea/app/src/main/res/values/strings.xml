@@ -26,6 +26,8 @@
     </string-array>
 
 
+    <string name="action_snack_text">Speak now…</string>
+
     <string name="activity_title_about_us">About Us</string>
     <string name="activity_title_privacy_policy">Privacy Policy</string>
     <string name="action_clear_all">Clear All</string>
@@ -33,11 +35,13 @@
     <string name="action_mark_all_read">Mark All as Read</string>
     <string name="privacy_policy">Privacy Policy</string>
 
-    <string name="app_name">AppMeA</string>
+    <string name="app_name">Slumber</string>
     <string name="menu_setting">Settings</string>
     <string name="logout">Logout</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nav_other_section">Other</string>
+    <string name="about_main_text">Slumber was created by some highschool students who were working on a project. Then wanted it to come into fruition. So they set out into making this home automation system. Initially made for patients with sleep apnea then created to be a any use product</string>
+    <string name="about_created_by">Created by Pseudonymous</string>
 </resources>

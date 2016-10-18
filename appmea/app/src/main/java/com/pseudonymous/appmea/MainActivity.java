@@ -1,6 +1,7 @@
 package com.pseudonymous.appmea;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,13 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.Theme;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.pseudonymous.appmea.dataparse.ChartConfig;
 import com.pseudonymous.appmea.fragment.DataFragment;
-import com.pseudonymous.appmea.fragment.HomeFragment;
 import com.pseudonymous.appmea.fragment.DeviceFragment;
+import com.pseudonymous.appmea.fragment.HomeFragment;
 import com.pseudonymous.appmea.fragment.NotificationsFragment;
 import com.pseudonymous.appmea.fragment.SettingsFragment;
 import com.pseudonymous.appmea.graphics.CircleTransform;
@@ -45,65 +46,107 @@ import com.pseudonymous.appmea.network.ResponseListener;
 import net.danlew.android.joda.JodaTimeAndroid;
 
 public class MainActivity extends AppCompatActivity implements
-        HomeFragment.OnFragmentInteractionListener, DataFragment.OnFragmentInteractionListener,
-        DeviceFragment.OnFragmentInteractionListener {
+        HomeFragment.OnFragmentInteractionListener,
+        DataFragment.OnFragmentInteractionListener,
+        DeviceFragment.OnFragmentInteractionListener,
+        SettingsFragment.OnFragmentInteractionListener,
+        NotificationsFragment.OnFragmentInteractionListener {
 
-    public static final String appName = "Appmea";
+    /*
+        VIEW LOADING
+     */
+
+
+    public static String appName, snackText;
     private NavigationView navigationView;
     private DrawerLayout drawer;
-    private View navigationHeader;
     private ImageView imageHeader, imageProfile;
     private TextView nameHeader, nameWebsite;
     private FloatingActionButton fab;
+    private Toolbar toolbar;
 
-    ChartConfig chart;
-    Toolbar toolbar;
+    /*
+        USER DATA AND PROFILE
+     */
 
+
+    //Global simple account settings
+    //User name (AKA first + " " + last)
+    //User site (Don't know why we have this currently)
+    public static volatile String
+            userName = "Slumber User",
+            userSite = "http://pseudonymous.tk";
+
+    //Background image to load (Maybe already cached on device) for the drawer layout
+    //Both images are loaded with Glide
     private static String urlNavHeaderBg =
-            "http://mwhd.altervista.org/wp_upload/wallpapers/material/" +
-                    "Rainbow_Material_Dark-Qwen_Lee.png";
+            "https://0.s3.envato.com/files/120334242/Preview%20image%20set/" +
+                    "blue-grey-light-blue.png";
 
+    //Profile picture (We auto round the image)
+    //@See CircleTransform.java
     private static String urlProfileImg =
             "https://media.licdn.com/mpr/mpr/shrinknp_200_200/" +
                     "AAEAAQAAAAAAAAltAAAAJGJkMTFkZjY3LTEwMjktNDk4Yy04Zjg5LWJkZDlhZThkMzQ1NQ.jpg";
 
+
+    public static ProfileData pfData; //Profile settings object
+    //Includes the auto loading of the data
+
+    /*
+        NAVIGATION AND LAYOUT
+     */
+
+
+    //Start the navigation at home
+    //Then add a circular padding to the notification icon in the drawer layout
     public static int
-            navigationIndex = 0,
+            navigationIndex = navEnum.HOME,
             numberPadding = 2;
 
-    public static volatile String
-            userName = "Demo User",
-            userSite = "http://pseudonymous.tk";
+    //Tags used to attach the fragments (No name display just the tag)
+    private static final String
+            TAG_HOME = "home",
+            TAG_DATA = "data",
+            TAG_DEVICE = "device",
+            TAG_NOTIFICATIONS = "notifications",
+            TAG_SETTINGS = "settings";
 
-
-    // tags used to attach the fragments
-    private static final String TAG_HOME = "home";
-    private static final String TAG_DATA = "data";
-    private static final String TAG_DEVICE = "device";
-    private static final String TAG_NOTIFICATIONS = "notifications";
-    private static final String TAG_SETTINGS = "settings";
-    private static String CURRENT_TAG = TAG_HOME;
-
+    private static String CURRENT_TAG = TAG_HOME; //Current tag to set at load time
     private String[] activityT; //Titles of the activities
+    private static final boolean loadOnBack = true; //If back is pressed load the home fragment
+    private Handler mHandle; //Message handling on main thread
 
-    private boolean loadOnBack = true;
-    private Handler mHandle;
 
 
-    public static ProfileData pfData; //Profile settings
-
+    /**
+     * The main function of the activity which will set the content of the activity and initially
+     * Blank view. This will also load any preset data such as the main thread handlers.
+     *
+     * @param savedInstanceState Previously saved data from the activity with Parcelable
+     * @see AppCompatActivity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Load basic string resources before anything else
+        final Resources resources = getResources();
+        appName = resources.getString(R.string.app_name); //Load app name into global
+        snackText = resources.getString(R.string.action_snack_text);
+
+        //Set the current view to main activity
         setContentView(R.layout.activity_main);
 
-
+        //UI thread handler for the refresh
         mHandle = new Handler();
 
+        //Custom toolbar and selection drop down options
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        //Add toolbar to the main view
         setSupportActionBar(toolbar);
 
+        //Set toolbar settings such as the app name
         toolbar.setTitle(appName);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
@@ -111,18 +154,22 @@ public class MainActivity extends AppCompatActivity implements
         toolbar.setTitleMarginBottom(16);
         toolbar.invalidate();
 
+        //Set the main fragment loading drawer
         drawer = (DrawerLayout) findViewById(R.id.activity_main);
+
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        //Little button in the bottom right for voice activation
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
         //Navigation view header
-        navigationHeader = navigationView.getHeaderView(0);
+        View navigationHeader = navigationView.getHeaderView(0);
         nameHeader = (TextView) navigationHeader.findViewById(R.id.name);
         nameWebsite = (TextView) navigationHeader.findViewById(R.id.website);
         imageHeader = (ImageView) navigationHeader.findViewById(R.id.img_header_bg);
         imageProfile = (ImageView) navigationHeader.findViewById(R.id.img_profile);
 
-
+        //Set the global activity string list for the titles
         activityT = getResources().getStringArray(R.array.nav_item_activity_titles);
 
         //Animate the movement up
@@ -143,9 +190,22 @@ public class MainActivity extends AppCompatActivity implements
         pfData = new ProfileData(); //New profile data object currently one user
 
         fab.setOnClickListener(new View.OnClickListener() {
+            @SuppressWarnings("deprecation")
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "HAHAHA ACTION SNACK", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Snackbar snackbar = Snackbar.make(view, snackText, Snackbar.LENGTH_LONG);
+                snackbar.setAction("Just say something and we will attempt to listen", null);
+
+                //Modify the color of the snackbar to match our dark theme
+                View viewSnack = snackbar.getView();
+
+                viewSnack.setBackgroundColor(resources.getColor(R.color.colorPrimary));
+
+                TextView textView = (TextView) viewSnack.
+                        findViewById(android.support.design.R.id.snackbar_text);
+                textView.setTextColor(resources.getColor(R.color.pseudo_text_color));
+
+                snackbar.show();
             }
         });
 
@@ -259,16 +319,38 @@ public class MainActivity extends AppCompatActivity implements
         });*/
     }
 
+
+    /**
+     * Globally log data with the same app tag so when using regex on the android monitor
+     * It's easier to parse by the appname and debugging vs changing each one individually
+     *
+     * @param toLog A string to log the new data with
+     */
     public static void LogData(String toLog) {
         LogData(toLog, false);
     }
 
+    /**
+     * Globally log data with the same app tag so when using regex on the android monitor
+     * It's easier to parse by the appname and debugging vs changing each one individually
+     *
+     * @param toLog A string to log the new data with
+     * @param error A boolean to indicate if the logged data is an error or not
+     */
     public static void LogData(String toLog, boolean error) {
         Log.d(appName, (error) ? "ERROR: " + toLog : toLog);
+        //Add ERROR string to beginning if error flag set
     }
 
-
+    /**
+     * Load asynchronously the user profile data from the server and update the global user
+     * Details. The current Value pair method is hacky and should be replaced in the final product
+     * For faster loading time and not as many crashes when the server responds with null values
+     * but with a still 200 okay response
+     */
     private void loadUserProfile() {
+
+        //Create an asynchronous response listener
         ResponseListener respListen = new ResponseListener() {
             @Override
             public void on_complete(CommonResponse req) {
@@ -291,17 +373,27 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void on_fail(CommonResponse req) {
-
+                //When the asynchronous request fails to load
             }
         };
 
         pfData.pullDetails(respListen);
     }
 
+
+    /**
+     * Method to load the profile data into the drawer layout whenever a new request is updated
+     * This will initially load {onCreate()} to show the demo user so it's not blank on load
+     * This should be changed in the final product
+     */
     private void loadNavBar() {
+
+        //Set the header text
         nameHeader.setText(userName);
         nameWebsite.setText(userSite);
 
+
+        //Load the global account images into the navigation drawer
         Glide.with(this).load(urlNavHeaderBg).crossFade().diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageHeader);
 
@@ -315,15 +407,35 @@ public class MainActivity extends AppCompatActivity implements
         //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
-    public void setNotificationDot(int index, boolean dotEnabled, int amountNotifications) {
-        navigationView.getMenu().getItem(index).setActionView(R.layout.menu_dot);
 
+    /**
+     * This method is for the drawer layout icon to display new notifications or updates
+     * To any drawer layout menu item that has a proper index, on fail nothing will be able
+     * To render
+     *
+     * @param index The menu item index (From top to bottom)
+     * @param dotEnabled Boolean to set alpha of dot to 100% or not
+     * @param amountNotifications The number to display in the menu bubble
+     * @see DrawerLayout
+     */
+    public void setNotificationDot(int index, boolean dotEnabled, int amountNotifications) {
+        //Get action menu and set dot as view
+
+        try {
+            navigationView.getMenu().getItem(index).setActionView(R.layout.menu_dot);
+        } catch (Throwable ignored) {
+            MainActivity.LogData("INDEX NOT AVAILABLE");
+            return;
+        }
+
+        //Locate the view of the dot and set the alpha channel based on if the device is enabled
         LinearLayout dotMenu = (LinearLayout) navigationView.getMenu().getItem(index)
                 .getActionView().findViewById(R.id.view_notification);
         dotMenu.setAlpha((dotEnabled) ? 1f : 0f);
         dotMenu.setGravity(Gravity.CENTER);
         //Set dot enabled based on how many notifications there are
         if(amountNotifications > 0) {
+            //Add text to the dot to signify the amount of notifications
             TextView amount = new TextView(this);
             amount.setGravity(Gravity.CENTER);
             amount.setTextColor(Color.WHITE);
@@ -334,9 +446,11 @@ public class MainActivity extends AppCompatActivity implements
             if(amountNotifications > 9) amount.setText("9+");
             else amount.setText(String.valueOf(amountNotifications));
 
+            //Show the little circle with notification amounts
             dotMenu.addView(amount);
         }
 
+        //Rendering check
         dotMenu.invalidate();
     }
 
@@ -398,12 +512,10 @@ public class MainActivity extends AppCompatActivity implements
                 return new DataFragment(); //Show the sleep reports
             case navEnum.DEVICE:
                 return new DeviceFragment(); //Show hub details
-            case 3:
-                // notifications fragment
-                return new NotificationsFragment();
-            case 4:
-                // settings fragment
-                return new SettingsFragment();
+            case navEnum.NOTIFICATIONS:
+                return new NotificationsFragment(); //Show all notifications
+            case navEnum.SETTINGS:
+                return new SettingsFragment(); // Load the settings fragment
         }
     }
 
@@ -444,17 +556,18 @@ public class MainActivity extends AppCompatActivity implements
                         CURRENT_TAG = TAG_DEVICE;
                         break;
                     case R.id.nav_notifications:
-                        navigationIndex = 3;
+                        navigationIndex = navEnum.NOTIFICATIONS;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_settings:
-                        navigationIndex = 4;
+                        navigationIndex = navEnum.SETTINGS;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
                     case R.id.nav_about_us:
-                        // launch new intent instead of loading fragment
-                        //startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
                         drawer.closeDrawers();
+                        startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                        overridePendingTransition(android.R.anim.slide_in_left,
+                                android.R.anim.slide_out_right);
                         return true;
                     case R.id.nav_privacy_policy:
                         // launch new intent instead of loading fragment
@@ -462,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements
                         drawer.closeDrawers();
                         return true;
                     default:
-                        navigationIndex = 0;
+                        navigationIndex = navEnum.HOME;
                 }
 
                 //Checking if the item is in checked state or not, if not make it in checked state
@@ -513,8 +626,8 @@ public class MainActivity extends AppCompatActivity implements
         if (loadOnBack) {
             // checking if user is on other navigation menu
             // rather than home
-            if (navigationIndex != 0) {
-                navigationIndex = 0;
+            if (navigationIndex != navEnum.HOME) {
+                navigationIndex = navEnum.HOME;
                 CURRENT_TAG = TAG_HOME;
                 loadHomeFragment();
                 return;
@@ -553,12 +666,12 @@ public class MainActivity extends AppCompatActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
 
         // show menu only when home fragment is selected
-        if (navigationIndex == 0) {
+        if (navigationIndex == navEnum.HOME) {
             getMenuInflater().inflate(R.menu.main_menu, menu);
         }
 
         // when fragment is notifications, load the menu created for notifications
-        if (navigationIndex == 3) {
+        if (navigationIndex == navEnum.NOTIFICATIONS) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
         return true;
@@ -573,7 +686,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startSettings() {
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, AboutActivity.class);
         startActivity(intent);
     }
 
@@ -605,5 +718,7 @@ class navEnum {
     static final int
             HOME = 0,
             DATA = 1,
-            DEVICE = 2;
+            DEVICE = 2,
+            NOTIFICATIONS = 3,
+            SETTINGS = 4;
 }
