@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SlumberHub</string>
+
+    <string name="usb_model">Slumber</string>
+    <string name="usb_manufacturer">Pseudonymous</string>
+    <string name="usb_version">1.0.0-alpha</string>
+
+    <string name="wifi_desc">Wifi signal level</string>
+    <string name="wifi_name">Failed loading name</string>
+    <string name="check_box_connect">Show password</string>
+    <string name="connect_security">Security</string>
+    <string name="connect_password">Password</string>
+</resources>

@@ -46,12 +46,13 @@ public class DataFragment extends Fragment {
 
     private Pair<DateTime, DateTime> currentRange;
 
-    private static ListView totalListView;
+    private ListView totalListView;
     private static PullToRefreshView pullRefresh;
     private static ArrayList<ChartConfig> charts = new ArrayList<>(); //Set data globally
     private static boolean isOneDay = true, firstRefresh = true;
     private static final int REFRESH_DELAY = 500, REFRESH_AMOUNT = 120000;
     private static Timer timeTask = new Timer();
+    public TabLayout tabLayout = null;
 
 
     public DataFragment() {
@@ -75,6 +76,19 @@ public class DataFragment extends Fragment {
             JodaTimeAndroid.init(getContext()); //Start Joda time
         } catch (Throwable ignored) {} //Main activity might have already started it
 
+    }
+
+    public void setCurrentTab(int position) {
+        boolean setTabPass = false;
+        if(tabLayout != null) {
+            TabLayout.Tab tab = tabLayout.getTabAt(position);
+            if(tab != null) {
+                tab.select();
+                setTabPass = true;
+            }
+        }
+        if(!setTabPass) MainActivity.LogData("Failed selecting the tab", true);
+        updateLayout(position);
     }
 
     //Called when we want to update the graph data
@@ -147,6 +161,106 @@ public class DataFragment extends Fragment {
                 composition.add(new Pair<>(TypeData.chartInit(), (Object) lastNight));
                 composition.add(new Pair<>(TypeData.titleInit(), (Object) "Recommendations"));
 
+
+                Object arr[] = new Object[] {
+                        "<html><body><h1><font color = \"FFFFFF\">I recommend</font></h1></body></html>",
+                        "<html><head><style>html *\n" +
+                                "{\n" +
+                                "   font-size: 1em !important;\n" +
+                                "   color: #FFF !important;\n" +
+                                "   font-family: Arial !important;\n" +
+                                "}</style></head><body><p>You should probably just go to hell</p>" +
+                                "<ol>\n" +
+                                "   <li>YAAY</li>\n" +
+                                "   <li>BAY</li>\n" +
+                                "</ol>\n" +
+                                "<a href=\"http://google.com\">Google Link</a>" +
+                                "</body></html>"
+                };
+
+                composition.add(new Pair<>(TypeData.textInit(), (Object) arr));
+
+                MainActivity.LogData("SIZE: " + composition.size());
+
+                ViewListAdapter viewListAdapter = new ViewListAdapter(getActivity(),
+                        getActivity(), composition);
+
+                totalListView.setAdapter(viewListAdapter);
+
+                //viewListAdapter.showAllViews(); //Make sure everything is visible
+
+                //ViewListAdapter.setListViewHeightBasedOnChildren(totalListView);
+
+                totalListView.invalidate(); //Update interface to make sure it appears
+            }
+        } else {
+            if(charts.isEmpty()) {
+                String toSet = "No Data Available For This Week";
+
+                TextView noData = new TextView(getContext());
+                noData.setText(toSet);
+                noData.setGravity(Gravity.CENTER);
+                noData.setTextColor(Color.RED);
+                noData.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            Looper.prepare();
+                        } catch (Throwable ignored) {}
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                                builder.setTitle("No Data");
+                                builder.setMessage("There isn't any data for this week")
+                                        .setCancelable(false)
+                                        .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+                        });
+                    }
+                });
+
+                totalListView.addView(noData);
+            } else {
+
+                //Default method to pull from stream and display to chart value name
+                //This method is completely asynchronous
+                //The last loading by common must be true to make sure it invalidates
+                //The graph and actually fixes the axis, including the activity to run
+                //The update thread on
+                ArrayList<String> streamChart = 
+
+                lastNight.LoadByCommonNetwork("graph_test_2", "Random2");
+                lastNight.LoadByCommonNetwork(CommonNetwork.test_stream, "Random", true,
+                        getActivity());
+
+
+                ArrayList<Pair<TypeData, Object>> composition = new ArrayList<>();
+
+                composition.add(new Pair<>(TypeData.titleInit(), (Object) "Day reports"));
+
+                for(int indexChart = 0; indexChart < charts.size(); indexChart++) {
+                    ChartConfig currentChart = charts.get(indexChart);
+
+                    currentChart.resetData(); //Set everything back to 0
+
+                    currentChart.setLabelDetails("Random", ColorTemplate.rgb("#80CBC4"),
+                            ColorTemplate.rgb("#80DEEA"));
+                    currentChart.setLabelDetails("Random2", ColorTemplate.rgb("#E57373"),
+                            ColorTemplate.rgb("#E57373"));
+
+
+                    composition.add(new Pair<>(TypeData.chartInit(), (Object) currentChart));
+                }
 
                 Object arr[] = new Object[] {
                         "<html><body><h1><font color = \"FFFFFF\">I recommend</font></h1></body></html>",
@@ -291,7 +405,7 @@ public class DataFragment extends Fragment {
 
 
     private void setupTabs(LinearLayout layout) {
-        TabLayout tabLayout = (TabLayout) layout.findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) layout.findViewById(R.id.tab_layout);
 
         for(Pair<String, Pair<Integer, Pair<DateTime, DateTime>>> key : TabSelection) {
             TabLayout.Tab tabAdd = tabLayout.newTab();

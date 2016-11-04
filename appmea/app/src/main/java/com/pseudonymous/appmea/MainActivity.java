@@ -1,17 +1,23 @@
 package com.pseudonymous.appmea;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.Theme;
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -42,15 +49,20 @@ import com.pseudonymous.appmea.graphics.CircleTransform;
 import com.pseudonymous.appmea.network.CommonResponse;
 import com.pseudonymous.appmea.network.ProfileData;
 import com.pseudonymous.appmea.network.ResponseListener;
+import com.pseudonymous.appmea.sound.ResultProcessor;
+import com.pseudonymous.appmea.sound.SpeechRecognition;
 
 import net.danlew.android.joda.JodaTimeAndroid;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener,
         DataFragment.OnFragmentInteractionListener,
         DeviceFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
-        NotificationsFragment.OnFragmentInteractionListener {
+        NotificationsFragment.OnFragmentInteractionListener,
+        ResultProcessor {
 
     /*
         VIEW LOADING
@@ -64,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements
     private TextView nameHeader, nameWebsite;
     private FloatingActionButton fab;
     private Toolbar toolbar;
+    private DataFragment dataFragment;
 
     /*
         USER DATA AND PROFILE
@@ -93,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements
     public static ProfileData pfData; //Profile settings object
     //Includes the auto loading of the data
 
+    public static volatile boolean isSpeechAvailable = false;
+
     /*
         NAVIGATION AND LAYOUT
      */
@@ -116,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements
     private String[] activityT; //Titles of the activities
     private static final boolean loadOnBack = true; //If back is pressed load the home fragment
     private Handler mHandle; //Message handling on main thread
+    private Snackbar snackbar;
 
 
 
@@ -189,25 +205,46 @@ public class MainActivity extends AppCompatActivity implements
 
         pfData = new ProfileData(); //New profile data object currently one user
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(view, snackText, Snackbar.LENGTH_LONG);
-                snackbar.setAction("Just say something and we will attempt to listen", null);
+        isSpeechAvailable = SpeechRecognition.speechAvailable(getApplicationContext());
 
-                //Modify the color of the snackbar to match our dark theme
-                View viewSnack = snackbar.getView();
+        //Request speech access
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    1);
+        }
 
-                viewSnack.setBackgroundColor(resources.getColor(R.color.colorPrimary));
+        //Check if we could use STT
+        if(!isSpeechAvailable) {
+            //Hide the fab if this platform doesn't support STT
+            fab.setVisibility(View.INVISIBLE);
+        } else {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @SuppressWarnings("deprecation")
+                @Override
+                public void onClick(View view) {
+                    snackbar = Snackbar.make(view, snackText, Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Just say something and we will attempt to listen", null);
 
-                TextView textView = (TextView) viewSnack.
-                        findViewById(android.support.design.R.id.snackbar_text);
-                textView.setTextColor(resources.getColor(R.color.pseudo_text_color));
+                    //Modify the color of the snackbar to match our dark theme
+                    View viewSnack = snackbar.getView();
 
-                snackbar.show();
-            }
-        });
+                    viewSnack.setBackgroundColor(resources.getColor(R.color.colorPrimary));
+
+                    TextView textView = (TextView) viewSnack.
+                            findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(resources.getColor(R.color.pseudo_text_color));
+
+                    snackbar.show();
+
+                    MainActivity.LogData("STARTING SPEECH INTENT");
+                    SpeechRecognition.startRecognition(getApplicationContext(), snackbar,
+                            MainActivity.this);
+                }
+            });
+        }
 
         //Load the navigation bar header (THEY SHOULD BE CONNECTED TO THE INTERNET)
         //Set to demo user during initialization
@@ -319,6 +356,25 @@ public class MainActivity extends AppCompatActivity implements
         });*/
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    isSpeechAvailable = true;
+                    toggleFab();
+                } else {
+                    isSpeechAvailable = false;
+                    fab.hide();
+                    Toast.makeText(MainActivity.this, "Permission denied to access audio",
+                            Toast.LENGTH_SHORT).show();
+                }
+            break;
+        }
+    }
 
     /**
      * Globally log data with the same app tag so when using regex on the android monitor
@@ -509,7 +565,8 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 return new HomeFragment(); //Default home fragment
             case navEnum.DATA:
-                return new DataFragment(); //Show the sleep reports
+                dataFragment = new DataFragment(); //Show the sleep reports
+                return dataFragment;
             case navEnum.DEVICE:
                 return new DeviceFragment(); //Show hub details
             case navEnum.NOTIFICATIONS:
@@ -530,6 +587,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private void selectNavMenu() {
         navigationView.getMenu().getItem(navigationIndex).setChecked(true);
+    }
+
+
+    private void loadFragment(int navIndex, String tag) {
+        navigationIndex = navIndex;
+        CURRENT_TAG = tag;
+        selectNavMenu();
+        loadHomeFragment();
     }
 
     private void setUpNavigationView() {
@@ -711,6 +776,84 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onPreclaimedResult(String speechResult) {
+        ArrayList<String> processed = SpeechRecognition.ProcessText(speechResult);
+
+        boolean failed = (processed == null);
+
+        if(!failed) {
+            if (SpeechRecognition.containsAll(processed,
+                    new String[]{"load", "last", "results"}
+            ) || SpeechRecognition.containsAll(processed,
+                    new String[]{"load", "data"})) {
+                String snackSet = "Loading results for ";
+
+                int loadFragTab = 0;
+                if(SpeechRecognition.containsSingle(processed, "night")) {
+                    MainActivity.LogData("Loading night view");
+                    snackSet += "last night";
+                    loadFragTab = 0;
+                } else if(SpeechRecognition.containsSingle(processed, "week")) {
+                    MainActivity.LogData("Loading weeks view");
+                    snackSet += "last weeks";
+                    loadFragTab = 1;
+                } else if(SpeechRecognition.containsSingle(processed, "month")) {
+                    MainActivity.LogData("Loading monthly view");
+                    snackSet += "last months";
+                    loadFragTab = 2;
+                }
+                snackbar.setText(snackSet);
+                loadFragment(navEnum.DATA, TAG_DATA);
+                final int finalLoadFragTab = loadFragTab;
+                Thread waitToSet = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            long start = SystemClock.currentThreadTimeMillis();
+
+                            while(SystemClock.currentThreadTimeMillis() - start < 2000)
+                            {
+                                if(dataFragment != null) {
+                                    if(dataFragment.tabLayout != null) break;
+                                }
+                                Thread.sleep(30);
+                            }
+                        } catch (InterruptedException error) {
+                            MainActivity.LogData("Failed waiting for tab setting");
+                        }
+
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(dataFragment != null)
+                                    dataFragment.setCurrentTab(finalLoadFragTab);
+                                else
+                                    MainActivity.LogData("FAILED SETTING TAB", true);
+                            }
+                        });
+                    }
+                });
+                waitToSet.setDaemon(true);
+                waitToSet.setName("Load tab");
+                waitToSet.start();
+            } else if(SpeechRecognition.containsAll(processed,
+                    new String[] {"view", "notifications"}
+            )) {
+                snackbar.setText("Loading notifications");
+            } else {
+                failed = true;
+                snackbar.setDuration(Snackbar.LENGTH_LONG);
+                snackbar.setText("Voice command not found");
+                snackbar.show();
+            }
+
+            if(!failed) snackbar.dismiss();
+        } else {
+            snackbar.dismiss();
+        }
     }
 }
 

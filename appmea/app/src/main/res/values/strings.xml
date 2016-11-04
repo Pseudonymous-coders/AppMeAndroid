@@ -26,7 +26,7 @@
     </string-array>
 
 
-    <string name="action_snack_text">Speak now…</string>
+    <string name="action_snack_text">Speak now</string>
 
     <string name="activity_title_about_us">About Us</string>
     <string name="activity_title_privacy_policy">Privacy Policy</string>
