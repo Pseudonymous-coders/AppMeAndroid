@@ -1,0 +1,170 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    tools:context="tk.pseudonymous.slumberhub.MainActivity">
+
+    <!--
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:text="@string/app_title"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:background="@color/black_overlay"/>-->
+
+    <RelativeLayout
+        android:id="@+id/top_left_button"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/data_main_selector"
+        android:clickable="true"
+        android:contentDescription="@string/app_name"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/top_left_button_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_data"
+            android:contentDescription="@string/image_dec"
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/top_left_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Data"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/top_left_button_image"/>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/top_right_button"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/home_normal"
+        android:clickable="true"
+        android:layout_toEndOf="@id/top_left_button"
+        android:padding="@dimen/button_padding"
+        android:contentDescription="@string/app_name" >
+
+        <ImageView
+            android:id="@+id/top_right_button_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_home"
+            android:contentDescription="@string/image_dec"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/top_right_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:text="Home"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/top_right_button_image"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottom_left_button"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/hub_normal"
+        android:clickable="true"
+        android:layout_below="@id/top_left_button"
+        android:layout_alignStart="@id/top_left_button"
+        android:contentDescription="@string/app_name" >
+
+        <ImageView
+            android:id="@+id/bottom_left_button_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_hub"
+            android:contentDescription="@string/image_dec"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/bottom_left_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:text="Hub"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/bottom_left_button_image"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottom_right_button"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/settings_normal"
+        android:clickable="true"
+        android:layout_below="@id/top_right_button"
+        android:layout_alignStart="@id/top_right_button"
+        android:layout_toEndOf="@id/bottom_left_button"
+        android:contentDescription="@string/app_name" >
+
+        <ImageView
+            android:id="@+id/bottom_right_button_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_settings"
+            android:contentDescription="@string/image_dec"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:layout_gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/bottom_right_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_columnWeight="0.25"
+            android:layout_rowWeight="0.1"
+            android:text="Settings"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/bottom_right_button_image"/>
+    </RelativeLayout>
+
+    <!--<Button
+        android:id="@+id/refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get list"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test wifi connection"
+        android:gravity="center_horizontal"/>
+
+    <ListView
+        android:id="@+id/wifiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+
+</RelativeLayout>

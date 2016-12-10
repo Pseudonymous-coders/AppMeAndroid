@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="30dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="88dp">
+
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh WiFi"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/reboot_button"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:layout_row="0"
+            android:drawableBottom="@drawable/ic_reboot"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"/>
+
+        <Button
+            android:text="Light Off"
+            android:layout_width="134dp"
+            android:layout_height="36dp"
+            android:id="@+id/light_off_button"
+            android:drawableStart="@drawable/ic_light_off"
+            android:layout_above="@+id/refresh"
+            android:layout_toStartOf="@+id/refresh"/>
+
+        <Button
+            android:text="Light On"
+            android:layout_width="134dp"
+            android:layout_height="36dp"
+            android:id="@+id/light_on_button"
+            android:drawableStart="@drawable/ic_light_on"
+            android:layout_above="@+id/refresh"
+            android:layout_toEndOf="@+id/refresh"/>
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/wifiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

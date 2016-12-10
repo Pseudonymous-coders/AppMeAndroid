@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.view.ViewPager
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+    <!--
+<RelativeLayout
+                android:id="@+id/main_relative"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:CircleProgressView="http://schemas.android.com/tools"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/sleep_text"
+        android:text="@string/zeroed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textSize="36sp"/>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/sleep_progress"
+        android:layout_width="275dp"
+        android:layout_height="275dp"
+        android:foregroundGravity="center"
+        app:cpb_background_progressbar_color="#80deea"
+        app:cpb_background_progressbar_width="10dp"
+        app:cpb_progressbar_color="#b71c1c"
+        app:cpb_progressbar_width="25dp"
+        app:cpb_progress="0"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        />
+
+
+    <at.grabner.circleprogress.CircleProgressView
+        android:id="@+id/sleep_progress"
+        android:layout_width="275dp"
+        android:layout_height="275dp"
+        CircleProgressView:cpv_autoTextSize="true"
+        CircleProgressView:cpv_barColor="#33691e"
+        CircleProgressView:cpv_barWidth="40dp"
+        CircleProgressView:cpv_innerContourSize="0dp"
+        CircleProgressView:cpv_maxValue="100"
+        CircleProgressView:cpv_outerContourSize="0dp"
+        CircleProgressView:cpv_rimColor="#a5d6a7"
+        CircleProgressView:cpv_rimWidth="40dp"
+        CircleProgressView:cpv_seekMode="true"
+        CircleProgressView:cpv_showUnit="true"
+        CircleProgressView:cpv_spinColor="@color/primary"
+        CircleProgressView:cpv_textColor="@color/primary_dark"
+        CircleProgressView:cpv_textScale="1"
+        CircleProgressView:cpv_unit="%"
+        CircleProgressView:cpv_unitColor="@color/primary_light"
+        CircleProgressView:cpv_unitPosition="right_top"
+        CircleProgressView:cpv_unitScale="1"
+        CircleProgressView:cpv_value="10"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/accel_prog_x"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:foregroundGravity="center"
+        app:cpb_background_progressbar_color="#80deea"
+        app:cpb_background_progressbar_width="3dp"
+        app:cpb_progressbar_color="#b71c1c"
+        app:cpb_progressbar_width="8dp"
+        android:padding="0dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="17dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/accel_prog_y"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:foregroundGravity="center"
+        app:cpb_background_progressbar_color="#80deea"
+        app:cpb_background_progressbar_width="3dp"
+        app:cpb_progressbar_color="#b71c1c"
+        app:cpb_progressbar_width="8dp"
+        android:padding="0dp"
+        android:layout_below="@+id/accel_prog_x"
+        android:layout_alignEnd="@+id/accel_prog_z"
+        android:layout_marginEnd="20dp"/>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/accel_prog_z"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:foregroundGravity="center"
+        app:cpb_background_progressbar_color="#80deea"
+        app:cpb_background_progressbar_width="3dp"
+        app:cpb_progressbar_color="#b71c1c"
+        app:cpb_progressbar_width="8dp"
+        android:padding="0dp"
+        android:layout_above="@+id/accel_prog_y"
+        android:layout_toEndOf="@+id/accel_prog_x"
+        android:layout_alignTop="@+id/accel_prog_x"/>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/accel_average"
+        android:layout_width="105dp"
+        android:layout_height="105dp"
+        android:foregroundGravity="center"
+        app:cpb_background_progressbar_color="#80deea"
+        app:cpb_background_progressbar_width="8dp"
+        app:cpb_progressbar_color="#b71c1c"
+        app:cpb_progressbar_width="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
+
+
+</RelativeLayout>
+-->

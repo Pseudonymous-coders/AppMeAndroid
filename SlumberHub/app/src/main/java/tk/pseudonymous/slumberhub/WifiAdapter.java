@@ -1,7 +1,9 @@
 package tk.pseudonymous.slumberhub;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -28,7 +30,7 @@ class WifiView {
     String ssid;
     private int rssi = 0;
     Drawable imageDisplay = null;
-    boolean secure = false;
+    boolean secure = false, connectedTo = false;
     String securityType = "None";
     private final static String secureTypes = ""; //No security
 
@@ -130,6 +132,12 @@ public class WifiAdapter extends ArrayAdapter<WifiView> {
 
         ssidName.setText(ap.ssid);
         rssiImage.setImageDrawable(ap.imageDisplay);
+
+        if(ap.connectedTo) {
+            MainActivity.LogData("Already connected to " + ap.ssid);
+            convertView.setBackgroundResource(R.color.highlightWifi);
+        }
+
         return convertView;
     }
 }
